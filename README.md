@@ -32,13 +32,19 @@ pip install -r <location of requirements.txt file>
 
 The -r flag is necessary to distinguish it from a typical pip install. Without the -r, pip will look for a package online called "requirements.txt". That is obviously not desirable.
 
-Note that on certain systems (like the school computers), the pip command may be restricted. To get around this, create a virtual environment with:
-```bash
-python3 -m venv <name_of_venv>
-```
-*Note that if your system only has Python 3 installed, just remove the 3 from the above command.*
+**Create the database**
 
-To activate the virtual environment, cd into the directory you created the environment in, and run the "activate" file. Now, you should be able to pip install the requirements. To deactivate the environment, run the "deactivate" file.  
+Load the dump
+
+```bash
+mysql < dump.sql
+```
+
+Information to connect to the DB : `database.cfg`
+
+```bash
+python3 utl/db_creation.py
+```
 
 **Run the program**
 

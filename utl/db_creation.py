@@ -1,10 +1,18 @@
 #========= ONLY RUN THIS FILE IF YOU WANT TO CREATE AN EMPTY DATABASE. ========#
 
-import sqlite3
+#import sqlite3
+from flask import Flask
+from flaskext.mysql import MySQL
 
-DB_FILE = "../database.db"
+mysql = MySQL()
+
+app = Flask(__name__)
+app.config.from_pyfile('../database.cfg')
+
+mysql.init_app(app)
+
 def init_db():
-    db = sqlite3.connect(DB_FILE) #open if file exists, otherwise create
+    db = mysql.connect()
     c = db.cursor()
 
     #Create accounts table (empty)
@@ -42,14 +50,14 @@ def init_db():
 
 
 def add_perks():
-    db = sqlite3.connect(DB_FILE) #open if file exists, otherwise create
+    db = mysql.connect()
     c = db.cursor()
 
     #In order: ID, name of perk, description of perk, cost of perk
-    c.execute("INSERT INTO perks VALUES (?, ?, ?, ?)", (0, "Cursor", "Generates 0.1 cookies while idle!", 15))
-    c.execute("INSERT INTO perks VALUES (?, ?, ?, ?)", (1, "Grandma", "Generates 1 cookie while idle!", 100))
-    c.execute("INSERT INTO perks VALUES (?, ?, ?, ?)", (2, "Farm", "Generates 8 cookies while idle!", 1100))
-    c.execute("INSERT INTO perks VALUES (?, ?, ?, ?)", (3, "Mine", "Generates 47 cookies while idle!", 12000))
+    c.execute("INSERT INTO perks VALUES (%s, %s, %s, %s)", [0, "Cursor", "Generates 0.1 cookies while idle!", 15])
+    c.execute("INSERT INTO perks VALUES (%s, %s, %s, %s)", [1, "Grandma", "Generates 1 cookie while idle!", 100])
+    c.execute("INSERT INTO perks VALUES (%s, %s, %s, %s)", [2, "Farm", "Generates 8 cookies while idle!", 1100])
+    c.execute("INSERT INTO perks VALUES (%s, %s, %s, %s)", [3, "Mine", "Generates 47 cookies while idle!", 12000])
 
     db.commit() #save changes
     db.close()

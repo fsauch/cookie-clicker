@@ -1,12 +1,18 @@
 from flask import *
 import os #for generating a secret key
-import sqlite3
 from functools import wraps
 
 from utl import db_ops
 from utl import api
 
+from flaskext.mysql import MySQL
+
+mysql = MySQL()
+
 app = Flask(__name__)
+app.config.from_pyfile('./database.cfg')
+
+mysql.init_app(app)
 
 #========================================
 #Secret key handling
@@ -171,11 +177,12 @@ def shop():
 
 @app.route("/api")
 def pass_info():
-	db = sqlite3.connect("database.db")
+	db = mysql.connect()
 	c = db.cursor()
 
 	username = session['username']
-	pull_info = c.execute("SELECT * FROM accounts WHERE username = (?)", (username,)).fetchall()[0]
+	c.execute("""SELECT * FROM accounts WHERE username = (%s)""", (username,))
+	pull_info = c.fetchall()[0]
 	info_dict = {"username": pull_info[0], "click": pull_info[2], "perk_0_lvl": pull_info[4], "perk_1_lvl": pull_info[5], "perk_2_lvl": pull_info[6], "perk_3_lvl": pull_info[7]}
 
 	db.commit()
@@ -185,10 +192,11 @@ def pass_info():
 
 @app.route("/api/perks/<perk_id>")
 def pass_task_info(perk_id):
-	db = sqlite3.connect("database.db")
+	db = mysql.connect()
 	c = db.cursor()
 
-	pull_info = c.execute("SELECT * FROM perks WHERE id = (?)", (perk_id,)).fetchall()[0]
+	c.execute("""SELECT * FROM perks WHERE id =%s""", (perk_id,))
+	pull_info = c.fetchall()[0]
 	info_dict = {"name": pull_info[1], "description": pull_info[2], "cost": pull_info[3]}
 
 	db.commit()
@@ -213,4 +221,4 @@ def record_trial():
 if __name__ == "__main__":
 	app.debug = True;
 	app.jinja_env.cache = {}
-	app.run();
+	app.run(host='0.0.0.0', port=80);
